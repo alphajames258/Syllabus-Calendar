@@ -15,10 +15,9 @@ export async function POST(request: NextRequest) {
         error: 'No syllabus text provided',
       });
     }
+    const prompt = `Help me pull out all the important dates and info from this course syllabus. I need to get everything into my calendar so I don't miss anything.
 
-    const prompt = `You are a  AI assistant helping students extract ALL important calendar events from their course syllabus. Think like a student who needs to know exactly what's happening each day without reading the full syllabus.
-
-Extract comprehensive course information and return ONLY valid JSON in this exact format:
+Return the data as JSON in this format:
 
 {
   "courseName": "string",
@@ -43,81 +42,38 @@ Extract comprehensive course information and return ONLY valid JSON in this exac
   "error": "boolean"
 }
 
-CRITICAL EXTRACTION RULES - BE EXTREMELY THOROUGH:
+What I need:
 
-1. COURSE INFO:
-   - courseName: Full course title (e.g., "Introduction to Computer Science")
-   - instructor: Professor/teacher name
-   - semester: Term/year (e.g., "Fall 2024", "Spring 2025")
+Basic info:
+- Course name and instructor
+- What semester/year this is for
+- How grades are calculated (percentages for exams, homework, etc.)
 
-2. GRADING BREAKDOWN (NO DESCRIPTION FIELD):
-   - Extract ALL grade components with percentages
-   - Look in sections: "Grading", "Assessment", "Evaluation", "Course Requirements"
-   - Examples: "Midterm 30%", "Final Exam 40%", "Homework 20%", "Participation 10%"
+All the dates:
+- Every assignment due date
+- All exams and quizzes
+- Project deadlines
+- Reading assignments
+- Regular class meetings if they're listed
+- Any other important dates
 
-3. EVENTS - EXTRACT EVERYTHING WITH A DATE (This is the most important part):
-   
-   SEARCH THESE SECTIONS THOROUGHLY:
-   - Course Schedule, Calendar, Important Dates
-   - Assignment Schedule, Due Dates
-   - Exam Schedule, Test Dates
-   - Project Deadlines, Milestones
-   - Reading Assignments, Chapter Due Dates
-   - Lab Sessions, Discussion Sections
-   - Class Topics, Lecture Schedule
-   - Office Hours, Review Sessions
-   - Drop/Add Deadlines, Withdrawal Dates
-   
-   DATE FORMATS TO HANDLE:
-   - "September 15", "Sept 15", "9/15", "15 Sep"
-   - "Monday, September 15", "Sept 15 (Mon)"
-   - "Week 3", "Third Week" (convert to actual dates)
-   - Relative dates: "First day of class", "Last day to drop"
-   
-   EVENT TYPES - Classify carefully:
-   - assignment: Homework, problem sets, written work
-   - exam: Tests, midterms, finals
-   - quiz: Short tests, pop quizzes
-   - project: Major projects, papers, presentations
-   - reading: Required readings, chapters, articles
-   - class: Regular class sessions, lectures
-   - discussion: Discussion sections, recitations
-   - presentation: Student presentations, demos
-   - lab: Laboratory sessions, practical work
-   - homework: Regular homework assignments
-   - midterm: Midterm exams
-   - final: Final exams
-   - other: Anything else with a date
-   
-   DESCRIPTION - Include key details:
-   - What exactly is due/happening
-   - Specific requirements or topics
-   - Format (online, in-person, take-home)
-   - Any special instructions
+For dates, handle different formats like "Sept 15", "9/15/2024", "Monday September 15", etc. If you see "Week 3" or similar, try to figure out the actual date.
 
-4. COMPREHENSIVE SEARCH STRATEGY:
-   - Read the ENTIRE document, not just obvious sections
-   - Look for tables, lists, bullet points with dates
-   - Check footnotes, appendices, additional pages
-   - Find recurring patterns (weekly assignments, regular quizzes)
-   - Extract both specific dates AND recurring events
-   - Don't skip anything that has a date or deadline
+For event types, use common sense:
+- "assignment" for homework, problem sets
+- "exam" for tests, midterms, finals  
+- "quiz" for short tests, entrance quizzes, exit tickets
+- "project" for big assignments, papers
+- "reading" for assigned readings
+- "class" for lectures, meetings, regular class sessions
+- "discussion" for class discussions, group work
+- And so on...
 
-5. DATE INFERENCE:
-   - If year missing, infer from semester context
-   - Convert relative dates to actual dates when possible
-   - Handle academic calendar references
-   - Week numbers: convert to actual dates if possible
+Important: If the syllabus describes what happens in every class (like "each class includes a quiz and discussion"), create events for each class date that show these recurring activities.
 
-6. QUALITY CONTROL:
-   - Extract EVERYTHING with a date - don't filter or skip
-   - If it's important enough to have a date, it's important enough to extract
-   - Double-check you haven't missed any sections
-   - Be thorough - students need complete information
+Make sure to check the whole document - sometimes important dates are buried in random paragraphs or at the bottom.
 
-IMPORTANT: This is for a student's personal calendar. They need to know EVERYTHING that's happening on specific dates. Don't skip anything just because it seems minor.
-
-Syllabus text:
+Here's the syllabus:
 ${syllabusText}`;
 
     const response = await anthropic.messages.create({
