@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 Syllabus Calendar
 
-## Getting Started
+**Upload your course syllabus PDF → Get an organized calendar of assignments and exams**
 
-First, run the development server:
+This app takes your syllabus PDFs and automatically creates a calendar showing all your important dates, assignments, and exam schedules.
+
+## What it does
+
+1. **Upload** your syllabus PDF
+2. **AI analyzes** the document and finds all important dates
+3. **View** your schedule in a calendar or list format
+4. **Manage** multiple courses in one place
+
+## Quick Start
+
+### 1. Get your Claude API key
+
+- Go to [console.anthropic.com](https://console.anthropic.com/)
+- Create an account and get your API key
+
+### 2. Set up the project
 
 ```bash
+# Clone and install
+git clone <your-repo-url>
+cd syllabus-calendar
+npm install
+
+# Add your API key
+echo "CLAUDE_API_KEY=your_key_here" > .env.local
+
+# Start the app
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Use the app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Open [localhost:3000](http://localhost:3000)
+- Click "Add New Syllabus"
+- Upload your PDF
+- View your organized schedule!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What you'll see
 
-## Learn More
+After uploading a syllabus, you'll get:
 
-To learn more about Next.js, take a look at the following resources:
+- **Course info**: Name, instructor, semester
+- **Grading breakdown**: What counts for your final grade
+- **Important dates**: Assignments, exams, quizzes, projects
+- **Two views**: Calendar view and list view
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How it works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Two-step approach for maximum accuracy:**
 
-## Deploy on Vercel
+1. **PDF Text Extraction**: First, the app extracts all text from your PDF using multiple parsing methods to ensure nothing is missed
+2. **Smart AI Analysis**: Then, Claude AI analyzes the extracted text using a carefully crafted prompt that knows exactly what to look for in syllabi
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This approach ensures the AI gets clean, complete text to work with, leading to more accurate extraction of your course information.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Requirements
+
+- Node.js (any recent version)
+- Claude API key (free tier available)
+
+## Tech Used
+
+- Next.js & React
+- Claude AI for PDF analysis
+- Tailwind CSS for styling
+
+---
