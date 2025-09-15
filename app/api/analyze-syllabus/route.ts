@@ -15,11 +15,21 @@ export async function POST(request: NextRequest) {
         error: 'No syllabus text provided',
       });
     }
-    const prompt = `Help me pull out all the important dates and info from this course syllabus. I need to get everything into my calendar so I don't miss anything.
+    const prompt = `You are a syllabus analysis expert. Your job is to extract important information from a course syllabus 
+
+VALIDATION FIRST:
+    Before processing, verify this is actually a course syllabus by checking for:
+    - Course name/number
+    - Instructor information
+    - Academic dates/schedule
+    - Grading information
+    - Learning objectives or course content
+    If this isn't a course syllabus, return: {"error": true, "message": (give exact reason why it is not a syllabus)}
 
 Return the data as JSON in this format:
 
 {
+  "error": false,
   "courseName": "string",
   "instructor": "string", 
   "semester": "string",
@@ -39,46 +49,71 @@ Return the data as JSON in this format:
     }
   ],
   "totalEvents": "number",
-  "error": "boolean"
+ 
 }
 
-What I need:
+BASIC INFO:
+Course name and instructor name only
+Semester/year
 
-Basic info:
-- Course name and instructor
-- What semester/year this is for
-- How grades are calculated (percentages for exams, homework, etc.)
+GRADING (keep it simple):
+Just the main categories and percentages
+Skip detailed policies
 
-All the dates:
-- Every assignment due date
-- All exams and quizzes
-- Project deadlines
-- Reading assignments
-- Regular class meetings if they're listed
-- Any other important dates
+EVENTS:
+All assignment due dates
+All exam dates (midterm, final, etc.)
+Project deadlines
+No-class days and holidays
+Regular class meetings (if specific dates given)
+Any other date with a deadline
+Reading assignments
 
-For dates, handle different formats like "Sept 15", "9/15/2024", "Monday September 15", etc. If you see "Week 3" or similar, try to figure out the actual date.
+DATE RULES:
+- Convert everything to YYYY-MM-DD format
+- Handle "Sept 15", "9/15", "Week 3", etc.
+- If you can't figure out exact date, skip it
 
-For event types, use common sense:
-- "assignment" for homework, problem sets
-- "exam" for tests, midterms, finals  
-- "quiz" for short tests, entrance quizzes, exit tickets
-- "project" for big assignments, papers
-- "reading" for assigned readings
-- "class" for lectures, meetings, regular class sessions
-- "discussion" for class discussions, group work
-- And so on...
 
-Important: If the syllabus describes what happens in every class (like "each class includes a quiz and discussion"), create events for each class date that show these recurring activities.
+WEEKLY READING SCHEDULES:
+If you see "Week 1", "Week 2" patterns with M: W: T: Th: assignments:
+1. Find class meeting days from syllabus (MW, TTh, etc.)
+2. Assume Week 1 starts on semester start date or typical fall/spring start
+3. Map Week X + Day to actual calendar date
+4. Create "Reading: [exact content]" events with type "assignment"
+5. Skip weeks marked "Holiday" or "no readings"
 
+Example: If class meets MW and Week 1 M has reading → first Monday of semester
+Week 3 M: Labor Day Holiday → create "no_class" event instead of reading
+
+RECURRING ACTIVITIES: 
+Look for phrases like:
+- "Each class will include..."
+- "Every [day] we will..."  
+- "Weekly assignments due..."
+- "Quiz every Tuesday"
+- "Homework due each Friday"
+
+When you find these:
+1. Calculate ALL class meeting dates for the semester
+2. Create individual events for EACH occurrence
+3. Use the meeting days/times from the syllabus
+4. Account for no-class days and holidays
+5. Don't just say "weekly quiz" - give me actual dates: Sept 3, Sept 10, Sept 17, etc.
+
+EXAMPLE: If class meets T/Th and "each class includes entrance quiz":
+- Create "Entrance Quiz" event for every Tuesday and Thursday
+- Skip dates that are marked as no-class days
+
+FOCUS ON: What goes on a calendar and when assignments are due.
 Make sure to check the whole document - sometimes important dates are buried in random paragraphs or at the bottom.
 
 Here's the syllabus:
 ${syllabusText}`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 2000,
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 10000,
       messages: [{ role: 'user', content: prompt }],
     });
 

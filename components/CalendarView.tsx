@@ -103,6 +103,25 @@ const CalendarView = ({ events }: CalendarViewProps) => {
     return date.toISOString().split('T')[0];
   };
 
+  const getTypeBadgeClasses = (type: CalendarEvent['type']) => {
+    switch (type) {
+      case 'assignment':
+        return 'bg-rose-100 text-rose-800 border border-rose-200';
+      case 'exam':
+        return 'bg-red-100 text-red-800 border border-red-200';
+      case 'quiz':
+        return 'bg-orange-100 text-orange-800 border border-orange-200';
+      case 'project':
+        return 'bg-amber-100 text-amber-800 border border-amber-200';
+      case 'reading':
+        return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+      case 'class':
+        return 'bg-blue-100 text-blue-800 border border-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+  };
+
   if (!events.length) {
     return (
       <div className="bg-gray-50 border rounded p-8 text-center">
@@ -113,6 +132,27 @@ const CalendarView = ({ events }: CalendarViewProps) => {
 
   return (
     <div className="bg-white border rounded-lg p-4">
+      {/* Legend */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {[
+          { label: 'Assignment', type: 'assignment' as const },
+          { label: 'Exam', type: 'exam' as const },
+          { label: 'Quiz', type: 'quiz' as const },
+          { label: 'Project', type: 'project' as const },
+          { label: 'Reading', type: 'reading' as const },
+          { label: 'Class', type: 'class' as const },
+          { label: 'Other', type: 'other' as const },
+        ].map((item) => (
+          <span
+            key={item.type}
+            className={`px-2 py-1 rounded text-xs font-medium ${getTypeBadgeClasses(
+              item.type
+            )}`}
+          >
+            {item.label}
+          </span>
+        ))}
+      </div>
       <div className="flex justify-between items-center mb-4 bg-blue-600 text-white p-4 rounded-lg">
         <button
           onClick={goToPreviousMonth}
@@ -173,7 +213,7 @@ const CalendarView = ({ events }: CalendarViewProps) => {
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((date, index) => {
           if (!date) {
-            return <div key={index} className="p-2 h-24"></div>;
+            return <div key={index} className="p-2 h-32"></div>;
           }
 
           const dateKey = formatDateKey(date);
@@ -183,7 +223,7 @@ const CalendarView = ({ events }: CalendarViewProps) => {
           return (
             <div
               key={dateKey}
-              className={`p-1 h-24 border border-gray-200 ${
+              className={`p-1 h-32 border border-gray-200 ${
                 isToday ? 'bg-blue-50 border-blue-300' : 'bg-white'
               }`}
             >
@@ -196,7 +236,7 @@ const CalendarView = ({ events }: CalendarViewProps) => {
               </div>
 
               <div className="space-y-1">
-                {dayEvents.map((event, eventIndex) => (
+                {dayEvents.slice(0, 2).map((event, eventIndex) => (
                   <div
                     key={eventIndex}
                     className="text-xs p-1 rounded bg-gray-100 text-gray-800"
@@ -207,6 +247,11 @@ const CalendarView = ({ events }: CalendarViewProps) => {
                     </div>
                   </div>
                 ))}
+                {dayEvents.length > 2 && (
+                  <div className="text-xs text-gray-500 text-center">
+                    +{dayEvents.length - 2} more
+                  </div>
+                )}
               </div>
             </div>
           );

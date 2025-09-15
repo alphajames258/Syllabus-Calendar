@@ -29,3 +29,10 @@ export interface ClaudeAnalysis {
 }
 
 export type ViewMode = 'list' | 'calendar';
+
+export interface SyllabusModalProps {
+  syllabus: ClaudeAnalysis;
+  viewMode: ViewMode;
+  onClose: () => void;
+  onViewModeChange: (mode: ViewMode) => void;
+}
