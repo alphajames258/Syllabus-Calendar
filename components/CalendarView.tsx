@@ -213,7 +213,7 @@ const CalendarView = ({ events }: CalendarViewProps) => {
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((date, index) => {
           if (!date) {
-            return <div key={index} className="p-2 h-32"></div>;
+            return <div key={`empty-${index}`} className="p-2 h-32"></div>;
           }
 
           const dateKey = formatDateKey(date);
@@ -238,11 +238,13 @@ const CalendarView = ({ events }: CalendarViewProps) => {
               <div className="space-y-1">
                 {dayEvents.slice(0, 2).map((event, eventIndex) => (
                   <div
-                    key={eventIndex}
-                    className="text-xs p-1 rounded bg-gray-100 text-gray-800"
+                    key={`${event.date}-${eventIndex}-${event.title}`}
+                    className={`text-xs p-1 rounded ${getTypeBadgeClasses(
+                      event.type
+                    )}`}
                   >
                     <div className="font-medium truncate">{event.title}</div>
-                    <div className="text-gray-600 truncate">
+                    <div className="text-xs opacity-75 truncate">
                       {event.description}
                     </div>
                   </div>
